@@ -774,8 +774,8 @@ namespace UnityEditor.XCodeEditor
 				this.AddOtherLinkerFlags( flag );
 			}
 
-			Debug.Log ("Adding plist items...");
 			string plistPath = this.projectRootPath + "/Info.plist";
+			Debug.Log ("Adding plist items: " + plistPath);
 			XCPlist plist = new XCPlist (plistPath);
 			plist.Process(mod.plist);
 

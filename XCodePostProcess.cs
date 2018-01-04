@@ -5,6 +5,7 @@ using UnityEditor.Callbacks;
 using UnityEditor.XCodeEditor;
 #endif
 using System.IO;
+using System.Linq;
 
 public static class XCodePostProcess
 {
@@ -13,7 +14,7 @@ public static class XCodePostProcess
 	[PostProcessBuild(999)]
 	public static void OnPostProcessBuild( BuildTarget target, string pathToBuiltProject )
 	{
-		if (target != BuildTarget.iPhone) {
+		if (target != BuildTarget.iOS) {
 			Debug.LogWarning("Target is not iPhone. XCodePostProcess will not run");
 			return;
 		}
@@ -23,7 +24,9 @@ public static class XCodePostProcess
 
 		// Find and run through all projmods files to patch the project.
 		// Please pay attention that ALL projmods files in your project folder will be excuted!
-		string[] files = Directory.GetFiles( Application.dataPath, "*.projmods", SearchOption.AllDirectories );
+		var files = (Directory.GetFiles( Application.dataPath, "*.projmods", SearchOption.AllDirectories ).Where(i=>{
+			return !i.Contains("/Editor/");
+		}).ToArray());
 		foreach( string file in files ) {
 			UnityEngine.Debug.Log("ProjMod File: "+file);
 			project.ApplyMod( file );

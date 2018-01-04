@@ -115,13 +115,23 @@ namespace UnityEditor.XCodeEditor
 			this.Remove( EXPLICIT_FILE_TYPE_KEY );
 			this.Remove( LASTKNOWN_FILE_TYPE_KEY );
 			string extension = System.IO.Path.GetExtension( (string)_data[ PATH_KEY ] );
-			if( !PBXFileReference.typeNames.ContainsKey( extension ) ){
+
+			string tmptype = null;
+			if( PBXFileReference.typeNames.TryGetValue( extension , out tmptype) ){
 				Debug.LogWarning( "Unknown file extension: " + extension + "\nPlease add extension and Xcode type to PBXFileReference.types" );
-				return;
+			}else{;
+				tmptype = "user-resource";
 			}
 			
-			this.Add( LASTKNOWN_FILE_TYPE_KEY, PBXFileReference.typeNames[ extension ] );
-			this.buildPhase = PBXFileReference.typePhases[ extension ];
+			this.Add( LASTKNOWN_FILE_TYPE_KEY, tmptype );
+
+			string tmpphase = null;
+			if(PBXFileReference.typePhases.TryGetValue(extension, out tmpphase))
+			{
+				buildPhase = tmpphase;
+			}else{
+				buildPhase = "PBXResourcesBuildPhase";
+			}
 		}
 		
 		private void SetFileType( string fileType )
