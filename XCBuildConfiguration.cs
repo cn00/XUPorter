@@ -182,7 +182,7 @@ namespace UnityEditor.XCodeEditor
 				 ((PBXDictionary)_data[BUILDSETTINGS_KEY]).Add( settingName, new PBXList() );
 			}
 			else if ( ((PBXDictionary)_data[BUILDSETTINGS_KEY])[ settingName ] is string ) {
-				//Debug.Log("key is string:" + settingName);
+				Debug.Log("key is string:" + settingName);
 				//string tempString = (string)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName];
 				((PBXDictionary)_data[BUILDSETTINGS_KEY])[ settingName ] = new PBXList();
 				//((PBXList)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName]).Add( tempString );

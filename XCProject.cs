@@ -272,14 +272,13 @@ namespace UnityEditor.XCodeEditor
 		public bool overwriteBuildSetting( string settingName, string newValue, string buildConfigName = "all") {
 			Debug.Log("overwriteBuildSetting " + settingName + " " + newValue + " " + buildConfigName);
 			foreach( KeyValuePair<string, XCBuildConfiguration> buildConfig in buildConfigurations ) {
-				//Debug.Log ("build config " + buildConfig);
 				XCBuildConfiguration b = buildConfig.Value;
 				if ( (string)b.data["name"] == buildConfigName || (string)buildConfigName == "all") {
-					//Debug.Log ("found " + b.data["name"] + " config");
+					Debug.Log (buildConfig.Key + "[" + b.data["name"] + "] => " + newValue);
 					buildConfig.Value.overwriteBuildSetting(settingName, newValue);
 					modified = true;
 				} else {
-					//Debug.LogWarning ("skipping " + buildConfigName + " config " + (string)b.data["name"]);
+					Debug.LogWarning ("skipping " + buildConfigName + " config " + (string)b.data["name"]);
 				}
 			}
 			return modified;
@@ -736,17 +735,28 @@ namespace UnityEditor.XCodeEditor
 			Debug.Log( "Adding embed binaries..." );
 			if (mod.embed_binaries != null)
 			{
-				//1. Add LD_RUNPATH_SEARCH_PATHS for embed framework
-				this.overwriteBuildSetting("LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks", "Release");
-				this.overwriteBuildSetting("LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks", "Debug");
-
+			    //1. Add LD_RUNPATH_SEARCH_PATHS for embed framework
+			    this.overwriteBuildSetting("LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks", "all");
 				foreach( string binary in mod.embed_binaries ) {
 					string absoluteFilePath = System.IO.Path.Combine( mod.path, binary );
 					this.AddEmbedFramework(absoluteFilePath);
 				}
 			}
-			
-			Debug.Log( "Adding folders..." );
+
+            Debug.Log("Adding overwriteBuildSetting ...");
+            if(mod.overwriteBuildSetting != null)
+            {
+                foreach(var i in XCPlist.HashtableToDictionary<string, object>(mod.overwriteBuildSetting))
+                {
+                    var name = i.Key;
+                    foreach(var config in XCPlist.HashtableToDictionary<string, string>((Hashtable)i.Value))
+                    {
+                        this.overwriteBuildSetting(name, config.Key, config.Value);
+                    }
+                }
+            }
+
+            Debug.Log( "Adding folders..." );
 			foreach( string folderPath in mod.folders ) {
 				string absoluteFolderPath = System.IO.Path.Combine( Application.dataPath, folderPath );
 				Debug.Log ("Adding folder " + absoluteFolderPath);

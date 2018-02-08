@@ -87,7 +87,15 @@ namespace UnityEditor.XCodeEditor
 			}
 		}
 
-		public Hashtable plist {
+        public Hashtable overwriteBuildSetting
+        {
+            get
+            {
+                return (Hashtable)_datastore["overwriteBuildSetting"];
+            }
+        }
+
+        public Hashtable plist {
 			get {
 				return (Hashtable)_datastore["plist"];
 			}
