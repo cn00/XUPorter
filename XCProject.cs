@@ -343,30 +343,30 @@ namespace UnityEditor.XCodeEditor
 				return results;
 			}
 
-			string absPath = string.Empty;
+			string absPath = filePath;
 			
 			if( Path.IsPathRooted( filePath ) ) {
 				Debug.Log( "Path is Rooted" );
 				absPath = filePath;
 			}
 			else if( tree.CompareTo( "SDKROOT" ) != 0) {
-				absPath = Path.Combine( Application.dataPath, filePath );
+				absPath = Path.GetFullPath( filePath );
 			}
 			
 			if( !( File.Exists( absPath ) || Directory.Exists( absPath ) ) && tree.CompareTo( "SDKROOT" ) != 0 ) {
-				Debug.Log( "Missing file: " + filePath );
+				Debug.Log( "Missing file: " + absPath );
 				return results;
 			}
 			else if( tree.CompareTo( "SOURCE_ROOT" ) == 0 ) {
-				Debug.Log( "Source Root File" );
 				System.Uri fileURI = new System.Uri( absPath );
-				System.Uri rootURI = new System.Uri( ( projectRootPath + "/." ) );
+				System.Uri rootURI = new System.Uri( ( projectRootPath + "/../" ) );
 				filePath = rootURI.MakeRelativeUri( fileURI ).ToString();
-			}
+                Debug.Log("Source Root File: " + filePath);
+            }
 			else if( tree.CompareTo("GROUP") == 0) {
-				Debug.Log( "Group File" );
 				filePath = System.IO.Path.GetFileName( filePath );
-			}
+                Debug.Log("Group File: " + filePath);
+            }
 
 			if( parent == null ) {
 				parent = _rootGroup;
@@ -375,8 +375,14 @@ namespace UnityEditor.XCodeEditor
 			//Check if there is already a file
 			PBXFileReference fileReference = GetFile( System.IO.Path.GetFileName( filePath ) );	
 			if( fileReference != null ) {
-				Debug.Log("File already exists: " + filePath); //not a warning, because this is normal for most builds!
-				return null;
+				//not a warning, because this is normal for most builds!
+				Debug.LogWarning("File already exists: " + filePath);
+
+                return null;
+                // // not work
+                // var key = GetKey(filePath);
+				// if(!string.IsNullOrEmpty(key))
+                // 	parent.Remove(key);
 			}
 			
 			fileReference = new PBXFileReference( filePath, (TreeEnum)System.Enum.Parse( typeof(TreeEnum), tree ) );
@@ -580,7 +586,7 @@ namespace UnityEditor.XCodeEditor
 
 			foreach( string directory in Directory.GetDirectories( folderPath ) ) {
 				Debug.Log( "DIR: " + directory );
-				if( directory.EndsWith( ".bundle" ) ) {
+				if( directory.EndsWith( ".bundle" ) || directory.EndsWith(".xcdatamodeld")) {
 					// Treat it like a file and copy even if not recursive
 					// TODO also for .xcdatamodeld?
 					Debug.LogWarning( "This is a special folder: " + directory );
@@ -667,7 +673,25 @@ namespace UnityEditor.XCodeEditor
 			
 			return null;
 		}
-		
+
+		public string GetKey(string name)
+		{
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
+            foreach (KeyValuePair<string, PBXFileReference> current in fileReferences)
+            {
+                if (!string.IsNullOrEmpty(current.Value.name) && current.Value.name.CompareTo(name) == 0)
+                {
+                    return current.Key;
+                }
+            }
+
+            return null;
+        }
+
 		public PBXGroup GetGroup( string name, string path = null, PBXGroup parent = null )
 		{
 			if( string.IsNullOrEmpty( name ) )
