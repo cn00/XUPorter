@@ -100,7 +100,7 @@ namespace UnityEditor.XCodeEditor
 				}
 				
 				Dictionary<string, object> urlTypeDict = this.findUrlTypeByName(bundleUrlTypes, name);
-				if (urlTypeDict == null)
+				if (urlTypeDict == null || string.IsNullOrEmpty(name))
 				{
 					urlTypeDict = new Dictionary<string, object>();
 					urlTypeDict[BundleTypeRole] = role;
