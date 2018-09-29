@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Linq;
 
 namespace PlistCS
 {
@@ -275,7 +276,12 @@ namespace PlistCS
 
                 if (result != null)
                 {
-                    dict.Add(keynode.InnerText, result);
+                    if(!dict.Keys.Contains(keynode.InnerText))
+                        dict.Add(keynode.InnerText, result);
+                    else
+                    {
+                        UnityEngine.Debug.Log(keynode.InnerText + " already exist.");
+                    }
                 }
             }
 
