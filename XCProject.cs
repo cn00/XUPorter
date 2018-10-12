@@ -343,6 +343,14 @@ namespace UnityEditor.XCodeEditor
 				return results;
 			}
 
+			// group
+			var split = filePath.Split(':');
+			if(split.Length > 1)
+			{
+				parent = GetGroupByPath(split[0]);
+				filePath = split[1];
+			}
+
 			string absPath = filePath;
 			
 			if( Path.IsPathRooted( filePath ) ) {
@@ -557,6 +565,22 @@ namespace UnityEditor.XCodeEditor
 		
 		public bool AddFolder( string folderPath, PBXGroup parent = null, string[] exclude = null, bool recursive = true, bool createBuildFile = true )
 		{
+			// group
+			var split = folderPath.Split(':');
+			if(split.Length > 1)
+			{
+				parent = GetGroupByPath(split[0]);
+				folderPath = split[1];
+			}
+
+			if( Path.IsPathRooted( folderPath ) ) {
+				Debug.Log( "Path is Rooted" );
+			}
+			else// if( tree.CompareTo( "SDKROOT" ) != 0)
+			{
+				folderPath = Path.GetFullPath( folderPath );
+			}
+
 			Debug.Log("Folder PATH: "+folderPath);
 			if( !Directory.Exists( folderPath ) ){
 				Debug.Log("Directory doesn't exist?");
@@ -586,7 +610,10 @@ namespace UnityEditor.XCodeEditor
 
 			foreach( string directory in Directory.GetDirectories( folderPath ) ) {
 				Debug.Log( "DIR: " + directory );
-				if( directory.EndsWith( ".bundle" ) || directory.EndsWith(".xcdatamodeld")) {
+				if(    directory.EndsWith( ".bundle" ) 
+					|| directory.EndsWith(".xcdatamodeld") 
+					|| directory.EndsWith(".framework")
+				) {
 					// Treat it like a file and copy even if not recursive
 					// TODO also for .xcdatamodeld?
 					Debug.LogWarning( "This is a special folder: " + directory );
@@ -692,6 +719,25 @@ namespace UnityEditor.XCodeEditor
             return null;
         }
 
+		public PBXGroup GetGroupByPath( string pathName, string path = null, PBXGroup parent = null )
+		{
+			if( string.IsNullOrEmpty( pathName ) )
+				return null;
+
+			var names = pathName.Split('/');
+			if(names.Length == 1)
+			{
+				return GetGroup( pathName, path, parent);
+			}
+
+			PBXGroup r = GetGroup( names[0], path, parent);
+			for(var i = 1; i < names.Length; ++i)
+			{
+				r = GetGroup( names[i], null, r);
+			}
+			return r;
+		}
+
 		public PBXGroup GetGroup( string name, string path = null, PBXGroup parent = null )
 		{
 			if( string.IsNullOrEmpty( name ) )
@@ -723,9 +769,6 @@ namespace UnityEditor.XCodeEditor
 		public void ApplyMod( string pbxmod )
 		{
 			XCMod mod = new XCMod( pbxmod );
-			foreach(var lib in mod.libs){
-				Debug.Log("Library: "+lib);
-			}
 			ApplyMod( mod );
 		}
 		
@@ -733,16 +776,28 @@ namespace UnityEditor.XCodeEditor
 		{	
 			PBXGroup modGroup = this.GetGroup( mod.group );
 			
-			Debug.Log( "Adding libraries..." );
-			
-			foreach( XCModFile libRef in mod.libs ) {
+			Debug.Log( "Adding syslibs..." );
+			foreach( XCModFile libRef in mod.syslibs ) {
 				string completeLibPath = System.IO.Path.Combine( "usr/lib", libRef.filePath );
 				Debug.Log ("Adding library " + completeLibPath);
 				this.AddFile( completeLibPath, modGroup, "SDKROOT", true, libRef.isWeak );
 			}
 			
-			Debug.Log( "Adding frameworks..." );
+			Debug.Log( "Adding userlibs..." );
+			var userLibsGroup = this.GetGroupByPath( "Libraries/UserLibs");
+			foreach( XCModFile libRef in mod.userlibs ) {
+				string completeLibPath = libRef.filePath;//System.IO.Path.Combine( "usr/lib", libRef.filePath );
+				Debug.Log ("Adding userlibs " + completeLibPath);
+				this.AddFile( completeLibPath, userLibsGroup, "SOURCE_ROOT", true, libRef.isWeak );
+			}
+			
+			Debug.Log( "Adding userframeworks..." );
 			PBXGroup frameworkGroup = this.GetGroup( "Frameworks" );
+			foreach( string framework in mod.userframeworks ) {
+				this.AddFile( framework, frameworkGroup);
+			}
+			
+			Debug.Log( "Adding frameworks..." );
 			foreach( string framework in mod.frameworks ) {
 				string[] filename = framework.Split( ':' );
 				bool isWeak = ( filename.Length > 1 ) ? true : false;
@@ -752,8 +807,7 @@ namespace UnityEditor.XCodeEditor
 
 			Debug.Log( "Adding files..." );
 			foreach( string filePath in mod.files ) {
-				string absoluteFilePath = System.IO.Path.Combine( Application.dataPath, filePath );
-				this.AddFile( absoluteFilePath, modGroup );
+				this.AddFile( filePath, modGroup );
 			}
 
 			Debug.Log( "Adding embed binaries..." );
@@ -782,9 +836,20 @@ namespace UnityEditor.XCodeEditor
 
             Debug.Log( "Adding folders..." );
 			foreach( string folderPath in mod.folders ) {
-				string absoluteFolderPath = System.IO.Path.Combine( Application.dataPath, folderPath );
-				Debug.Log ("Adding folder " + absoluteFolderPath);
-				this.AddFolder( absoluteFolderPath, modGroup, (string[])mod.excludes.ToArray( typeof(string) ) );
+				// string absoluteFolderPath = null;
+				// var split = folderPath.Split(':');
+				// PBXGroup group = modGroup;
+				// if(split.Length < 2)
+				// {
+				// 	absoluteFolderPath = Path.GetFullPath(folderPath);
+				// }
+				// else
+				// {
+				// 	group = GetGroupByPath(split[0]);
+				// 	absoluteFolderPath = Path.GetFullPath(split[1]);
+				// }
+				Debug.Log ("Adding folder " + folderPath);
+				this.AddFolder( folderPath, modGroup, (string[])mod.excludes.ToArray( typeof(string) ) );
 			}
 			
 			Debug.Log( "Adding headerpaths..." );
@@ -793,7 +858,7 @@ namespace UnityEditor.XCodeEditor
 					Debug.Log ("not prepending a path to " + headerpath);
 					this.AddHeaderSearchPaths( headerpath );
 				} else {
-					string absoluteHeaderPath = System.IO.Path.Combine( Application.dataPath, headerpath );
+					string absoluteHeaderPath = Path.GetFullPath(headerpath);
 					this.AddHeaderSearchPaths( absoluteHeaderPath );
 				}
 			}

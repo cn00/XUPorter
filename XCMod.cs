@@ -1,13 +1,15 @@
 using UnityEngine;
 using System.Collections;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace UnityEditor.XCodeEditor 
 {
 	public class XCMod 
 	{
 		private Hashtable _datastore = new Hashtable();
-		private ArrayList _libs = null;
+		private ArrayList _syslibs = null;
+		private ArrayList _userlibs = null;
 		
 		public string name { get; private set; }
 		public string path { get; private set; }
@@ -26,22 +28,40 @@ namespace UnityEditor.XCodeEditor
 			}
 		}
 		
-		public ArrayList libs {
+		public ArrayList syslibs {
 			get {
-				if( _libs == null ) {
-					_libs = new ArrayList( ((ArrayList)_datastore["libs"]).Count );
-					foreach( string fileRef in (ArrayList)_datastore["libs"] ) {
-						Debug.Log("Adding to Libs: "+fileRef);
-						_libs.Add( new XCModFile( fileRef ) );
+				if( _syslibs == null ) {
+					_syslibs = new ArrayList( ((ArrayList)_datastore["syslibs"]).Count );
+					foreach( string fileRef in (ArrayList)_datastore["syslibs"] ) {
+						Debug.Log("Adding to syslibs: "+fileRef);
+						_syslibs.Add( new XCModFile( fileRef ) );
 					}
 				}
-				return _libs;
+				return _syslibs;
+			}
+		}
+		
+		public ArrayList userlibs {
+			get {
+				if( _userlibs == null ) {
+					_userlibs = new ArrayList( ((ArrayList)_datastore["userlibs"]).Count );
+					foreach( string fileRef in (ArrayList)_datastore["userlibs"] ) {
+						_userlibs.Add( new XCModFile( fileRef ) );
+					}
+				}
+				return _userlibs;
 			}
 		}
 		
 		public ArrayList frameworks {
 			get {
 				return (ArrayList)_datastore["frameworks"];
+			}
+		}
+
+		public ArrayList userframeworks {
+			get {
+				return (ArrayList)_datastore["userframeworks"];
 			}
 		}
 		
@@ -112,10 +132,12 @@ namespace UnityEditor.XCodeEditor
 			path = System.IO.Path.GetDirectoryName( filename );
 			
 			string contents = projectFileInfo.OpenText().ReadToEnd();
+			contents = Regex.Replace(contents, "//.*", "");
+			contents = Regex.Replace(contents, "/\\*(.|\r|\n)*\\*/", "", RegexOptions.Multiline);
 			Debug.Log (contents);
 			_datastore = (Hashtable)XUPorterJSON.MiniJSON.jsonDecode( contents );
 			if (_datastore == null || _datastore.Count == 0) {
-				Debug.Log (contents);
+				// Debug.Log (contents);
 				throw new UnityException("Parse error in file " + System.IO.Path.GetFileName(filename) + "! Check for typos such as unbalanced quotation marks, etc.");
 			}
 		}
