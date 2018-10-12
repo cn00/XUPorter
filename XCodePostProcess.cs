@@ -9,7 +9,7 @@ using System.Linq;
 
 public static class XCodePostProcess
 {
-
+/* 
 #if UNITY_EDITOR
 	[PostProcessBuild(999)]
 	public static void OnPostProcessBuild( BuildTarget target, string pathToBuiltProject )
@@ -28,7 +28,7 @@ public static class XCodePostProcess
 			return !i.Contains("/Editor/");
 		}).ToArray());
 		foreach( string file in files ) {
-			UnityEngine.Debug.Log("ProjMod File: "+file);
+			App.Log("ProjMod File: "+file);
 			project.ApplyMod( file );
 		}
 
@@ -40,6 +40,7 @@ public static class XCodePostProcess
 
 	}
 #endif
+	*/
 
 	public static void Log(string message)
 	{
