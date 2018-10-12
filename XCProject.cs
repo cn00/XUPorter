@@ -67,7 +67,7 @@ namespace UnityEditor.XCodeEditor
 				this.filePath = filePath;
 			} else {
 				Debug.Log( "Looking for xcodeproj files in " + filePath );
-				string[] projects = System.IO.Directory.GetDirectories( filePath, "*.xcodeproj" );
+				string[] projects = System.IO.Directory.GetDirectories( filePath, "Unity-iPhone.xcodeproj" );
 				if( projects.Length == 0 ) {
 					Debug.LogWarning( "Error: missing xcodeproj file" );
 					return;
@@ -359,7 +359,7 @@ namespace UnityEditor.XCodeEditor
 			}
 			else if( tree.CompareTo( "SOURCE_ROOT" ) == 0 ) {
 				System.Uri fileURI = new System.Uri( absPath );
-				System.Uri rootURI = new System.Uri( ( projectRootPath + "/../" ) );
+				System.Uri rootURI = new System.Uri( projectRootPath );
 				filePath = rootURI.MakeRelativeUri( fileURI ).ToString();
                 Debug.Log("Source Root File: " + filePath);
             }
@@ -752,7 +752,7 @@ namespace UnityEditor.XCodeEditor
 
 			Debug.Log( "Adding files..." );
 			foreach( string filePath in mod.files ) {
-				string absoluteFilePath = System.IO.Path.Combine( mod.path, filePath );
+				string absoluteFilePath = System.IO.Path.Combine( Application.dataPath, filePath );
 				this.AddFile( absoluteFilePath, modGroup );
 			}
 
@@ -762,7 +762,7 @@ namespace UnityEditor.XCodeEditor
 			    //1. Add LD_RUNPATH_SEARCH_PATHS for embed framework
 			    this.overwriteBuildSetting("LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks", "all");
 				foreach( string binary in mod.embed_binaries ) {
-					string absoluteFilePath = System.IO.Path.Combine( mod.path, binary );
+					string absoluteFilePath = System.IO.Path.Combine( Application.dataPath, binary );
 					this.AddEmbedFramework(absoluteFilePath);
 				}
 			}
@@ -793,7 +793,7 @@ namespace UnityEditor.XCodeEditor
 					Debug.Log ("not prepending a path to " + headerpath);
 					this.AddHeaderSearchPaths( headerpath );
 				} else {
-					string absoluteHeaderPath = System.IO.Path.Combine( mod.path, headerpath );
+					string absoluteHeaderPath = System.IO.Path.Combine( Application.dataPath, headerpath );
 					this.AddHeaderSearchPaths( absoluteHeaderPath );
 				}
 			}
