@@ -9,7 +9,6 @@ namespace UnityEditor.XCodeEditor
 	{
 		private Hashtable _datastore = new Hashtable();
 		private ArrayList _syslibs = null;
-		private ArrayList _userlibs = null;
 		
 		public string name { get; private set; }
 		public string path { get; private set; }
@@ -43,13 +42,7 @@ namespace UnityEditor.XCodeEditor
 		
 		public ArrayList userlibs {
 			get {
-				if( _userlibs == null ) {
-					_userlibs = new ArrayList( ((ArrayList)_datastore["userlibs"]).Count );
-					foreach( string fileRef in (ArrayList)_datastore["userlibs"] ) {
-						_userlibs.Add( new XCModFile( fileRef ) );
-					}
-				}
-				return _userlibs;
+				return (ArrayList)_datastore["userlibs"];
 			}
 		}
 		

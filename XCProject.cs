@@ -362,7 +362,7 @@ namespace UnityEditor.XCodeEditor
 			}
 			
 			if( !( File.Exists( absPath ) || Directory.Exists( absPath ) ) && tree.CompareTo( "SDKROOT" ) != 0 ) {
-				Debug.Log( "Missing file: " + absPath );
+				Debug.LogError( "Missing file: " + absPath );
 				return results;
 			}
 			else if( tree.CompareTo( "SOURCE_ROOT" ) == 0 ) {
@@ -784,11 +784,9 @@ namespace UnityEditor.XCodeEditor
 			}
 			
 			Debug.Log( "Adding userlibs..." );
-			var userLibsGroup = this.GetGroupByPath( "Libraries/UserLibs");
-			foreach( XCModFile libRef in mod.userlibs ) {
-				string completeLibPath = libRef.filePath;//System.IO.Path.Combine( "usr/lib", libRef.filePath );
-				Debug.Log ("Adding userlibs " + completeLibPath);
-				this.AddFile( completeLibPath, userLibsGroup, "SOURCE_ROOT", true, libRef.isWeak );
+			foreach( string libRef in mod.userlibs ) {
+				Debug.Log ("Adding userlibs " + libRef);
+				this.AddFile( libRef);
 			}
 			
 			Debug.Log( "Adding userframeworks..." );
