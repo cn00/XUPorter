@@ -168,9 +168,9 @@ namespace UnityEditor.XCodeEditor
 			return modified;
 		}
 		
-		public bool overwriteBuildSetting(string settingName, string settingValue) {
-			Debug.Log ("overwriteBuildSetting " + settingName + " " + settingValue);
-			bool modified = false;
+		public bool overwriteBuildSetting(string settingName, object settingValue) {
+			Debug.Log ("overwriteBuildSetting " + settingName + ": " + settingValue);
+			bool modified = true;
 			
 			if( !ContainsKey( BUILDSETTINGS_KEY ) ) {
 				Debug.Log ("creating key " + BUILDSETTINGS_KEY);
@@ -179,20 +179,20 @@ namespace UnityEditor.XCodeEditor
 				
 			if( !((PBXDictionary)_data[BUILDSETTINGS_KEY]).ContainsKey( settingName ) ) {
 				Debug.Log("adding key " + settingName);
-				 ((PBXDictionary)_data[BUILDSETTINGS_KEY]).Add( settingName, new PBXList() );
+				 ((PBXDictionary)_data[BUILDSETTINGS_KEY]).Add( settingName, settingValue/*new PBXList()*/ );
 			}
 			else if ( ((PBXDictionary)_data[BUILDSETTINGS_KEY])[ settingName ] is string ) {
 				Debug.Log("key is string:" + settingName);
 				//string tempString = (string)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName];
-				((PBXDictionary)_data[BUILDSETTINGS_KEY])[ settingName ] = new PBXList();
+				((PBXDictionary)_data[BUILDSETTINGS_KEY])[ settingName ] = settingValue;//new PBXList();
 				//((PBXList)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName]).Add( tempString );
 			}
 			
-			if( !((PBXList)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName]).Contains( settingValue ) ) {
-				Debug.Log("setting " + settingName + " to " + settingValue);
-				((PBXList)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName]).Add( settingValue );
-				modified = true;
-				}
+			// if( !((PBXList)((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName]).Contains( settingValue ) ) {
+			// 	Debug.Log("setting " + settingName + " to " + settingValue);
+			// 	(((PBXDictionary)_data[BUILDSETTINGS_KEY])[settingName]) = settingValue;//.Add( settingValue );
+			// 	modified = true;
+			// }
 			
 			return modified;
 		}			

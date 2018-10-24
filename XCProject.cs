@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace UnityEditor.XCodeEditor
@@ -269,12 +270,11 @@ namespace UnityEditor.XCodeEditor
 			return modified;	
 		}
 		
-		public bool overwriteBuildSetting( string settingName, string newValue, string buildConfigName = "all") {
-			Debug.Log("overwriteBuildSetting " + settingName + " " + newValue + " " + buildConfigName);
+		public bool overwriteBuildSetting( string settingName, string buildConfigName, object newValue) {
 			foreach( KeyValuePair<string, XCBuildConfiguration> buildConfig in buildConfigurations ) {
-				XCBuildConfiguration b = buildConfig.Value;
-				if ( (string)b.data["name"] == buildConfigName || (string)buildConfigName == "all") {
-					Debug.Log (buildConfig.Key + "[" + b.data["name"] + "] => " + newValue);
+				var b = buildConfig.Value;
+				if ( (string)b.data["name"] == buildConfigName || buildConfigName == "all") {
+					Debug.Log (buildConfig.Key + ":" + settingName + "[" + buildConfigName + "] = " + newValue);
 					buildConfig.Value.overwriteBuildSetting(settingName, newValue);
 					modified = true;
 				} else {
@@ -825,7 +825,13 @@ namespace UnityEditor.XCodeEditor
                 foreach(var i in XCPlist.HashtableToDictionary<string, object>(mod.overwriteBuildSetting))
                 {
                     var name = i.Key;
-                    foreach(var config in XCPlist.HashtableToDictionary<string, string>((Hashtable)i.Value))
+					Debug.Log("all: " + name);
+                    foreach(var config in XCPlist.HashtableToDictionary<string, object>((Hashtable)i.Value).Where(ii => ii.Key == "all"))
+                    {
+                        this.overwriteBuildSetting(name, config.Key, config.Value);
+                    }
+					Debug.Log("~all: " + name);
+                    foreach(var config in XCPlist.HashtableToDictionary<string, object>((Hashtable)i.Value).Where(ii => ii.Key != "all"))
                     {
                         this.overwriteBuildSetting(name, config.Key, config.Value);
                     }
