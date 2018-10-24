@@ -1,0 +1,79 @@
+{
+    "group": "demo",
+    "compiler_flags": [
+        "-DIOS_TW=1",
+        "-DUSE_DATASDK=1"
+    ],
+    "linker_flags": [
+        "-ObjC", 
+        "-lresolv",
+        "-weak_framework",
+        "CoreMotion",
+        "-weak-lSystem",
+        "-Wl,-undefined,dynamic_lookup",
+    ],
+    "embed_binaries": [],
+    "overwriteBuildSetting":{
+        "SWIFT_VERSION": {
+            "all":"4.2",
+        },
+        "ENABLE_BITCODE": {
+            "all":"NO",
+        },
+        "LD_RUNPATH_SEARCH_PATHS":{
+            "all":["$(inherited)", "@executable_path/Frameworks"],
+        },
+    },
+    "syslibs": [
+        "libc++.tbd",
+        "libz.tbd"
+    ],
+    "userlibs":[
+
+    ],
+    "frameworks": [
+        "CoreData.framework",
+        "Security.framework",
+        "AdSupport.framework",
+        "StoreKit.framework",
+        "SystemConfiguration.framework",
+        "CoreGraphics.framework",
+        "UIKit.framework",
+        "Foundation.framework",
+        "SafariServices.framework",
+        "Bolts.framework",
+    ],
+    "userframeworks":[
+    ],
+    "headerpaths": [
+        "iospatch/KGameSdk/KGameSdkLib/include",
+        "iospatch/KGameSdk/KGameSdkLib/include/KGameSdkCenter",
+    ],
+    "plist": {
+        "FacebookDisplayName":"A3!",
+        "FacebookAppID":"2195831977115857",
+        "urltype" : [
+            {
+                "role": "Editor",
+                "name" : "fb",
+                "schemes":[
+                    "fb2195831977115857",
+                ]
+            },
+            {
+                "role": "Editor",
+                "name" : "google",
+                "schemes":[
+                    "com.googleusercontent.apps.663290335646-r26u7pvaompfrtn6rbiq7jak4bf4uvcv"
+                ]
+            }
+        ]
+    },
+    "files":   [// folder as folder
+    ],
+    "folders": [// folders as groups framework bundle and xcdatamodeld also support
+        "demo:iospatch/KGameSdk",
+        "demo:iospatch/KGameData",
+    ],
+    "excludes": ["^.*.meta$", "^.*.mdown$", "^.*.pdf$"]
+}
