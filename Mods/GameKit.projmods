@@ -1,7 +1,9 @@
 {
     "group": "GameCenter",
-    "libs": [],
+    "syslibs": [],
+    "userlibs": [],
     "frameworks": [],
+    "userframeworks":[],
     "headerpaths": ["iOS/GameCenter/**"],
     "files":   ["iOS/GameCenter/GKWrapper.m",
                 "iOS/GameCenter/GKWrapper.h"

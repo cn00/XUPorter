@@ -1,6 +1,9 @@
 {
     "group": "KKKeychain",
-    "libs": [],
+    "syslibs": [],
+    "userlibs": [],
+    "frameworks": [],
+    "userframeworks":[],
     "frameworks": ["Security.framework"],
     "headerpaths": [],
     "files":   [],

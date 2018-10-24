@@ -1,6 +1,8 @@
 {
     "group": "Store",
-    "libs": [],
+    "syslibs": [],
+    "userlibs": [],
+    "userframeworks":[],
     "frameworks": ["StoreKit.framework"],
     "headerpaths": [],                    
     "files":   ["iOS/Store/libStoreKit.a"],
