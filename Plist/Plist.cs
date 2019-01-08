@@ -108,6 +108,7 @@ namespace PlistCS
             using (StreamWriter writer = new StreamWriter(path))
             {
                 writer.Write(writeXml(value));
+                writer.Dispose();
             }
         }
 

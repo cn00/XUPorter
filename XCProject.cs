@@ -57,6 +57,16 @@ namespace UnityEditor.XCodeEditor
 		
 		public XCProject( string filePath ) : this()
 		{
+			#if APP_BIND
+			{
+				if(!Application.identifier.Contains("a3"))
+				{
+					Debug.LogError("unknow err.");
+					return;
+				}
+			}
+			#endif
+
 			if( !System.IO.Directory.Exists( filePath ) ) {
 				Debug.LogWarning( "XCode project path does not exist: " + filePath );
 				return;
@@ -777,6 +787,7 @@ namespace UnityEditor.XCodeEditor
 			PBXGroup modGroup = this.GetGroup( mod.group );
 			
 			Debug.Log( "Adding syslibs..." );
+			if(mod.syslibs != null)
 			foreach( XCModFile libRef in mod.syslibs ) {
 				string completeLibPath = System.IO.Path.Combine( "usr/lib", libRef.filePath );
 				Debug.Log ("Adding library " + completeLibPath);
@@ -784,6 +795,7 @@ namespace UnityEditor.XCodeEditor
 			}
 			
 			Debug.Log( "Adding userlibs..." );
+			if(mod.userlibs != null)
 			foreach( string libRef in mod.userlibs ) {
 				Debug.Log ("Adding userlibs " + libRef);
 				this.AddFile( libRef);
@@ -791,11 +803,13 @@ namespace UnityEditor.XCodeEditor
 			
 			Debug.Log( "Adding userframeworks..." );
 			PBXGroup frameworkGroup = this.GetGroup( "Frameworks" );
+			if(mod.userframeworks != null)
 			foreach( string framework in mod.userframeworks ) {
 				this.AddFile( framework, frameworkGroup);
 			}
 			
 			Debug.Log( "Adding frameworks..." );
+			if(mod.frameworks != null)
 			foreach( string framework in mod.frameworks ) {
 				string[] filename = framework.Split( ':' );
 				bool isWeak = ( filename.Length > 1 ) ? true : false;
@@ -804,6 +818,7 @@ namespace UnityEditor.XCodeEditor
 			}
 
 			Debug.Log( "Adding files..." );
+			if(mod.files != null)
 			foreach( string filePath in mod.files ) {
 				this.AddFile( filePath, modGroup );
 			}
@@ -839,6 +854,7 @@ namespace UnityEditor.XCodeEditor
             }
 
             Debug.Log( "Adding folders..." );
+			if(mod.folders != null)
 			foreach( string folderPath in mod.folders ) {
 				// string absoluteFolderPath = null;
 				// var split = folderPath.Split(':');
@@ -857,6 +873,7 @@ namespace UnityEditor.XCodeEditor
 			}
 			
 			Debug.Log( "Adding headerpaths..." );
+			if(mod.headerpaths != null)
 			foreach( string headerpath in mod.headerpaths ) {
 				if (headerpath.Contains("$(inherited)")) {
 					Debug.Log ("not prepending a path to " + headerpath);
@@ -868,11 +885,13 @@ namespace UnityEditor.XCodeEditor
 			}
 
 			Debug.Log( "Adding compiler flags..." );
+			if (mod.compiler_flags != null)
 			foreach( string flag in mod.compiler_flags ) {
 				this.AddOtherCFlags( flag );
 			}
 
 			Debug.Log( "Adding linker flags..." );
+			if (mod.linker_flags != null)
 			foreach( string flag in mod.linker_flags ) {
 				this.AddOtherLinkerFlags( flag );
 			}
@@ -880,7 +899,8 @@ namespace UnityEditor.XCodeEditor
 			string plistPath = this.projectRootPath + "/Info.plist";
 			Debug.Log ("Adding plist items: " + plistPath);
 			XCPlist plist = new XCPlist (plistPath);
-			plist.Process(mod.plist);
+			if(mod.plist!=null)
+				plist.Process(mod.plist);
 
 			this.Consolidate();
 		}
