@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace UnityEditor.XCodeEditor 
 {
@@ -62,6 +63,20 @@ namespace UnityEditor.XCodeEditor
 			{
 				dict[key] = HashtableToDictionary<string, object>((Hashtable)value);
 				plistModified = true;
+			}
+			else if (value is ArrayList)
+			{
+				object arro;
+				if(!dict.TryGetValue(key, out arro))
+				{
+					arro = dict[key] = new List<object>();
+				}
+				var arr = arro as List<object>;
+				foreach(string s in value as ArrayList)
+				{
+					arr.Add(s);
+				}
+				dict[key] = arr.Distinct().ToList();
 			}
             else if(value is string)
             {

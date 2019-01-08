@@ -5,7 +5,7 @@
         "-DUSE_DATASDK=1"
     ],
     "linker_flags": [
-        "-ObjC", 
+        "-ObjC",
         "-lresolv",
         "-weak_framework",
         "CoreMotion",
@@ -13,24 +13,25 @@
         "-Wl,-undefined,dynamic_lookup",
     ],
     "embed_binaries": [],
-    "overwriteBuildSetting":{
+    "overwriteBuildSetting": {
         "SWIFT_VERSION": {
-            "all":"4.2",
+            "all": "4.2",
         },
         "ENABLE_BITCODE": {
-            "all":"NO",
+            "all": "NO",
         },
-        "LD_RUNPATH_SEARCH_PATHS":{
-            "all":["$(inherited)", "@executable_path/Frameworks"],
+        "LD_RUNPATH_SEARCH_PATHS": {
+            "all": [
+                "$(inherited)",
+                "@executable_path/Frameworks"
+            ],
         },
     },
     "syslibs": [
         "libc++.tbd",
         "libz.tbd"
     ],
-    "userlibs":[
-
-    ],
+    "userlibs": [],
     "frameworks": [
         "CoreData.framework",
         "Security.framework",
@@ -43,37 +44,67 @@
         "SafariServices.framework",
         "Bolts.framework",
     ],
-    "userframeworks":[
-    ],
+    "userframeworks": [],
     "headerpaths": [
         "iospatch/KGameSdk/KGameSdkLib/include",
         "iospatch/KGameSdk/KGameSdkLib/include/KGameSdkCenter",
     ],
     "plist": {
-        "FacebookDisplayName":"A3!",
-        "FacebookAppID":"2195831977115857",
-        "urltype" : [
+        "FacebookDisplayName": "A3!",
+        "FacebookAppID": "2195831977115857",
+        "urltype": [
             {
                 "role": "Editor",
-                "name" : "fb",
-                "schemes":[
+                "name": "fb",
+                "schemes": [
                     "fb2195831977115857",
                 ]
             },
             {
                 "role": "Editor",
-                "name" : "google",
-                "schemes":[
+                "name": "google",
+                "schemes": [
                     "com.googleusercontent.apps.663290335646-r26u7pvaompfrtn6rbiq7jak4bf4uvcv"
                 ]
-            }
+            },
+
+            // sharesdk begin
+            {
+                "role": "Editor",
+                "name": "weixin",
+                "schemes": [
+                    "wx80f782bf334563fd",
+                ]
+            },
+            {
+                "role": "Editor",
+                "name": "weichat",
+                "schemes": [
+                    "wx80f782bf334563fd",
+                ]
+            },
+            // sharesdk end
+            
+        ],
+        
+        // LSApplicationQueriesSchemes
+        "LSApplicationQueriesSchemes": [
+            "bilibili.oauth.v2",
+            "weichat",
+            "weixin",
+            "mqq",
+            "sinaweibo",
         ]
     },
-    "files":   [// folder as folder
+    "files": [ // folder as folder
     ],
-    "folders": [// folders as groups framework bundle and xcdatamodeld also support
+    "folders": [ // folders as groups framework bundle and xcdatamodeld also support
         "demo:iospatch/KGameSdk",
         "demo:iospatch/KGameData",
     ],
-    "excludes": ["^.*.meta$", "^.*.mdown$", "^.*.pdf$"]
+    "excludes": [
+        "^.*.meta$",
+        "^.*.mdown$",
+        "^.*.pdf$"
+    ]
 }
